@@ -142,3 +142,10 @@ function markSpinToday() {
 const address = await connectTonWallet();
 walletAddress = address;
 await checkWelcomeBonus(walletAddress);
+// Lors du chargement de la page
+const urlParams = new URLSearchParams(window.location.search);
+const refWallet = urlParams.get("ref");
+
+if (refWallet && walletAddress && refWallet !== walletAddress) {
+  addReferral(refWallet); // firebase.js
+}
