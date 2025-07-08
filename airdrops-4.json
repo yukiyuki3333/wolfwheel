@@ -1,0 +1,35 @@
+[
+  {
+    "id": "2025-08-01",
+    "date": "2025-08-01T00:00:00Z",
+    "status": "pending",
+    "flexible": true,
+    "minPlayers": 100,
+    "minTON": 50
+  },
+  {
+    "id": "2025-11-01",
+    "date": "2025-11-01T00:00:00Z",
+    "status": "pending",
+    "flexible": true,
+    "minPlayers": 120,
+    "minTON": 60
+  },
+  {
+    "id": "2026-02-01",
+    "date": "2026-02-01T00:00:00Z",
+    "status": "pending",
+    "flexible": true,
+    "minPlayers": 140,
+    "minTON": 70
+  },
+  {
+    "id": "2026-05-01",
+    "date": "2026-05-01T00:00:00Z",
+    "status": "pending",
+    "flexible": true,
+    "minPlayers": 160,
+    "minTON": 80
+  }
+]
+
