@@ -250,3 +250,83 @@ spinBtn.addEventListener("click", async () => {
 import { isAdmin } from "./wallet-admin.js";
 if (isAdmin(walletAddress)) {
   UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV
+const canvas = document.getElementById("wheelCanvas");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
+
+const segments = ["1 TON", "0.5 TON", "💸 Perdu", "2 TON", "🎁 Bonus", "💀 Rien"];
+const colors = ["#FFD700", "#FF8C00", "#FF4444", "#00C851", "#33b5e5", "#888"];
+
+let angle = 0;
+let spinning = false;
+
+function drawWheel() {
+  const radius = canvas.width / 2;
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const arc = (2 * Math.PI) / segments.length;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < segments.length; i++) {
+    const start = angle + i * arc;
+    const end = start + arc;
+
+    ctx.beginPath();
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, start, end);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(start + arc / 2);
+    ctx.fillStyle = "#fff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(segments[i], radius - 10, 10);
+    ctx.restore();
+  }
+
+  // Flèche
+  ctx.beginPath();
+  ctx.moveTo(centerX - 10, 10);
+  ctx.lineTo(centerX + 10, 10);
+  ctx.lineTo(centerX, 40);
+  ctx.fillStyle = "#000";
+  ctx.fill();
+}
+
+function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+
+  const spinAngle = Math.random() * 360 + 720; // 2 tours minimum
+  const duration = 3000;
+  const start = performance.now();
+
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    angle = (spinAngle * easeOut(progress)) * Math.PI / 180;
+    drawWheel();
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      const selected = segments[Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * segments.length)];
+      alert("🎉 Résultat : " + selected);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+drawWheel();
+spinBtn.addEventListener("click", spinWheel);
+
