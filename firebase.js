@@ -88,3 +88,18 @@ export function listenToLeaderboard(callback) {
     callback(leaderboard.slice(0, 10));
   });
 }
+export async function checkWelcomeBonus(wallet) {
+  const ref = doc(db, "players", wallet);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      spins: 0,
+      lastSpin: "",
+      rewards: [],
+      referrals: 0,
+      airdropEligible: true
+    });
+    // Ici tu déclenches l’envoi de 0.5 TON
+    console.log("🎁 Bonus de bienvenue accordé !");
+  }
+}
