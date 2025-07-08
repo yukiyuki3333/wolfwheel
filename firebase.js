@@ -103,3 +103,18 @@ export async function checkWelcomeBonus(wallet) {
     console.log("🎁 Bonus de bienvenue accordé !");
   }
 }
+export function listenToLeaderboard(callback, admin = false) {
+  const playersRef = collection(db, "players");
+  onSnapshot(playersRef, (snapshot) => {
+    const leaderboard = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      leaderboard.push({
+        wallet: doc.id,
+        spins: data.spins || 0
+      });
+    });
+    leaderboard.sort((a, b) => b.spins - a.spins);
+    callback(admin ? leaderboard : leaderboard.slice(0, 10));
+  });
+}
