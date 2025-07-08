@@ -182,3 +182,26 @@ function updateCountdown() {
 
 setInterval(updateCountdown, 60000); // met à jour chaque minute
 updateCountdown();
+const ADMIN_WALLET = "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV"; // ton wallet
+
+function isAdmin(wallet) {
+  return wallet === ADMIN_WALLET;
+}
+spinBtn.addEventListener("click", () => {
+  if (!walletAddress) {
+    alert("Connecte ton wallet d'abord !");
+    return;
+  }
+
+  if (isAdmin(walletAddress)) {
+    spinWheel(); // admin peut tirer à volonté
+    return;
+  }
+
+  if (canSpinToday()) {
+    spinWheel();
+    markSpinToday();
+  } else {
+    alert("🕒 Tu as déjà utilisé ton spin gratuit aujourd’hui !");
+  }
+});
