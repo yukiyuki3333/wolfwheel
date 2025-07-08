@@ -246,3 +246,7 @@ spinBtn.addEventListener("click", async () => {
     }
   }
 });
+
+import { isAdmin } from "./wallet-admin.js";
+if (isAdmin(walletAddress)) {
+  UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV
