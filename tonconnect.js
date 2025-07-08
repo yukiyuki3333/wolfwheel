@@ -46,3 +46,22 @@ async function payTon(fromWallet, amountTon = 1) {
     return false;
   }
 }
+export async function sendWelcomeBonus(toWallet) {
+  const tx = {
+    validUntil: Math.floor(Date.now() / 1000) + 60,
+    messages: [
+      {
+        address: toWallet,
+        amount: "500000000", // 0.5 TON en nanotons
+        payload: ""
+      }
+    ]
+  };
+
+  try {
+    const result = await connector.sendTransaction(tx);
+    console.log("🎁 0.5 TON envoyés :", result);
+  } catch (e) {
+    console.error("Erreur envoi bonus :", e);
+  }
+}
