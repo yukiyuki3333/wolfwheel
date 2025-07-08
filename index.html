@@ -3,23 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🌕 WOLF WHEEL</title>
+  <title>🐺 WOLF WHEEL</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>🌕 WOLF WHEEL</h1>
-  <p id="status">Chargement...</p>
+  <h1>🐺 WOLF WHEEL</h1>
 
-  <button id="spinButton">🎯 Tirer pour 1 TON</button>
-  <button id="freeSpinButton" style="display:none;">🎁 Tir gratuit aujourd’hui</button>
-  <p id="result"></p>
-
-  <div id="referral">
-    <p>🎁 Invite 3 amis = 3 tirs bonus</p>
-    <button id="inviteBtn">🔗 Obtenir mon lien</button>
-    <input type="text" id="referralLink" readonly />
+  <div id="walletSection">
+    <button id="connectBtn">🔐 Connecter mon wallet</button>
+    <p id="walletAddress"></p>
   </div>
 
+  <canvas id="wheel" width="300" height="300"></canvas>
+  
+  <button id="spinBtn">🎡 Tourner la roue</button>
+  <button id="paySpinBtn">💸 Spin 1 TON</button>
+
+  <p id="result"></p>
+
+  <div id="leaderboard">
+    <h2>🏆 Classement</h2>
+    <ul id="leaderboardList"></ul>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="tonconnect.js"></script>
+  <script src="firebase.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
