@@ -1,4 +1,11 @@
 // === CONFIGURATION ===
+let refWalletGlobal = null;
+
+const urlParams = new URLSearchParams(window.location.search);
+refWalletGlobal = urlParams.get("ref") || null;
+if (refWalletGlobal && walletAddress && refWalletGlobal !== walletAddress) {
+  addReferral(refWalletGlobal); // appel à Firebase
+}
 const spinBtn = document.getElementById("spinBtn");
 const paySpinBtn = document.getElementById("paySpinBtn");
 const result = document.getElementById("result");
