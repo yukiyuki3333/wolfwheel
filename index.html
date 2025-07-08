@@ -2,45 +2,58 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🐺 WOLF WHEEL</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Roue de la Meute</title>
+  <style>
+    body {
+      text-align: center;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    #wheel {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: 40px auto;
+    }
+
+    #wheel img {
+      width: 100%;
+      transform: rotate(0deg);
+      transition: transform 4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    #pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid red;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: gold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>🐺 WOLF WHEEL</h1>
-
-  <div id="walletSection">
-    <button id="connectBtn">🔐 Connecter mon wallet</button>
-    <p id="walletAddress"></p>
+  <h1>🎡 Roue de la Meute</h1>
+  <div id="wheel">
+    <div id="pointer"></div>
+    <img id="wheelImage" src="wheel.png" alt="wheel" />
   </div>
+  <button id="spinBtn">🎯 SPIN</button>
 
-  <canvas id="wheel" width="300" height="300"></canvas>
-  
-  <button id="spinBtn">🎡 Tourner la roue</button>
-  <button id="paySpinBtn">💸 Spin 1 TON</button>
-
-  <p id="result"></p>
-
-  <div id="leaderboard">
-    <h2>🏆 Classement</h2>
-    <ul id="leaderboardList"></ul>
-  </div>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="tonconnect.js"></script>
-  <script src="firebase.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
-<p id="airdropCountdown"></p>
-
-<p id="airdropCountdown" style="margin-top: 15px; font-size: 1.1em; color: #ffd700;"></p>
-<canvas id="wheelCanvas" width="400" height="400"></canvas>
-<button id="spinBtn">🎯 SPIN</button>
-<script src="script.js" type="module"></script>
-</body>
-</html>
-window.onload = () => {
-  drawWheel();
-};
-
