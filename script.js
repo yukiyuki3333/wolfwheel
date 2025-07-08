@@ -120,3 +120,22 @@ function easeOutCubic(t) {
 // === INIT ===
 drawWheel();
 document.getElementById("connectBtn").addEventListener("click", connectWallet);
+listenToLeaderboard((topPlayers) => {
+  const list = document.getElementById("leaderboardList");
+  list.innerHTML = "";
+  topPlayers.forEach((p, i) => {
+    const li = document.createElement("li");
+    li.innerText = `#${i + 1} ${p.wallet.slice(0, 6)}... : ${p.spins} spins`;
+    list.appendChild(li);
+  });
+});
+function canSpinToday() {
+  const last = localStorage.getItem("lastSpinDate");
+  const today = new Date().toISOString().split("T")[0];
+  return last !== today;
+}
+
+function markSpinToday() {
+  const today = new Date().toISOString().split("T")[0];
+  localStorage.setItem("lastSpinDate", today);
+}
