@@ -139,3 +139,6 @@ function markSpinToday() {
   const today = new Date().toISOString().split("T")[0];
   localStorage.setItem("lastSpinDate", today);
 }
+const address = await connectTonWallet();
+walletAddress = address;
+await checkWelcomeBonus(walletAddress);
