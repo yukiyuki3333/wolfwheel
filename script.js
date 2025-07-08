@@ -149,3 +149,29 @@ const refWallet = urlParams.get("ref");
 if (refWallet && walletAddress && refWallet !== walletAddress) {
   addReferral(refWallet); // firebase.js
 }
+function getNextAirdropDate() {
+  const start = new Date("2025-01-01T00:00:00Z"); // date de départ
+  const now = new Date();
+  const months = 4;
+  let next = new Date(start);
+  while (next < now) {
+    next.setMonth(next.getMonth() + months);
+  }
+  return next;
+}
+
+function updateCountdown() {
+  const target = getNextAirdropDate();
+  const now = new Date();
+  const diff = target - now;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+  document.getElementById("airdropCountdown").innerText =
+    `🪂 Prochain airdrop dans : ${days}j ${hours}h ${minutes}min`;
+}
+
+setInterval(updateCountdown, 60000); // met à jour chaque minute
+updateCountdown();
