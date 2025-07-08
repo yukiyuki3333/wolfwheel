@@ -65,3 +65,25 @@ export async function sendWelcomeBonus(toWallet) {
     console.error("Erreur envoi bonus :", e);
   }
 }
+
+export async function payToSpin() {
+  const tx = {
+    validUntil: Math.floor(Date.now() / 1000) + 60,
+    messages: [
+      {
+        address: "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV", // TON wallet de Yuki
+        amount: "1000000000", // 1 TON = 1e9 nanotons
+        payload: ""
+      }
+    ]
+  };
+
+  try {
+    const result = await connector.sendTransaction(tx);
+    console.log("💸 Paiement reçu !", result);
+    return true;
+  } catch (e) {
+    console.error("❌ Paiement échoué :", e);
+    return false;
+  }
+}
