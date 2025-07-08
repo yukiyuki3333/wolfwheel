@@ -34,3 +34,10 @@ async function seedAirdropDates() {
 }
 
 seedAirdropDates();
+{
+  date: "2025-08-01T00:00:00Z",
+  status: "pending",
+  flexible: true,
+  minPlayers: 100,
+  minTON: 50
+}
