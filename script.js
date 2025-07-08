@@ -184,6 +184,8 @@ setInterval(updateCountdown, 60000); // met à jour chaque minute
 updateCountdown();
 const ADMIN_WALLET = "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV"; // ton wallet
 
+
+
 function isAdmin(wallet) {
   return wallet === ADMIN_WALLET;
 }
@@ -214,3 +216,33 @@ listenToLeaderboard((players) => {
     list.appendChild(li);
   });
 }, isAdmin(walletAddress));
+
+
+import { payToSpin } from "./tonconnect.js";
+
+spinBtn.addEventListener("click", async () => {
+  if (!walletAddress) {
+    alert("Connecte ton wallet d'abord !");
+    return;
+  }
+
+  if (isAdmin(walletAddress)) {
+    spinWheel(); // 👑 Admin = spin illimité
+    return;
+  }
+
+  if (canSpinToday()) {
+    spinWheel();
+    markSpinToday();
+  } else {
+    const confirmPay = confirm("Tu as déjà utilisé ton spin gratuit. Veux-tu payer 1 TON pour rejouer ?");
+    if (confirmPay) {
+      const paid = await payToSpin();
+      if (paid) {
+        spinWheel(); // 🎡 Spin après paiement réussi
+      } else {
+        alert("❌ Paiement échoué. Réessaie.");
+      }
+    }
+  }
+});
