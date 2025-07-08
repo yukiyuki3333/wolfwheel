@@ -1,332 +1,83 @@
-// === CONFIGURATION ===
-let refWalletGlobal = null;
-
-const urlParams = new URLSearchParams(window.location.search);
-refWalletGlobal = urlParams.get("ref") || null;
-if (refWalletGlobal && walletAddress && refWalletGlobal !== walletAddress) {
-  addReferral(refWalletGlobal); // appel à Firebase
-}
+const wheelImg = document.getElementById("wheelImage");
 const spinBtn = document.getElementById("spinBtn");
-const paySpinBtn = document.getElementById("paySpinBtn");
-const result = document.getElementById("result");
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-const segments = ["Mini 💫", "Double 🎁", "0.5 TON 🔥", "Rien 😢", "Mega 🐺", "Bonus 👑"];
-const colors = ["#f39c12", "#e74c3c", "#9b59b6", "#3498db", "#2ecc71", "#e67e22"];
-let isSpinning = false;
-let angle = 0;
-let walletAddress = null;
 
-// === WALLET CONNECTION ===
-async function connectWallet() {
-  const address = await connectTonWallet(); // depuis tonconnect.js
-  walletAddress = address;
-  document.getElementById("walletAddress").innerText = `Wallet : ${walletAddress}`;
-  await checkWelcomeBonus(walletAddress);
-}
+let currentRotation = 0;
 
-// === DESSIN DE LA ROUE ===
-function drawWheel() {
-  const radius = canvas.width / 2;
-  const arc = (2 * Math.PI) / segments.length;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  segments.forEach((label, i) => {
-    const start = i * arc;
-    const end = start + arc;
-    ctx.beginPath();
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, start, end);
-    ctx.fill();
-    ctx.save();
-    ctx.translate(radius, radius);
-    ctx.rotate(start + arc / 2);
-    ctx.fillStyle = "#fff";
-    ctx.font = "16px sans-serif";
-    ctx.fillText(label, radius / 2, 0);
-    ctx.restore();
-  });
-}
-
-// === SPIN GRATUIT PAR JOUR ===
-function canSpinToday() {
-  const last = localStorage.getItem("lastSpinDate");
-  const today = new Date().toISOString().split("T")[0];
-  return last !== today;
-}
-
-function markSpinToday() {
-  const today = new Date().toISOString().split("T")[0];
-  localStorage.setItem("lastSpinDate", today);
-}
-
-// === LANCEMENT DE LA ROUE ===
-function spinWheel() {
-  if (isSpinning) return;
-  isSpinning = true;
-  const spins = 10 + Math.floor(Math.random() * 10);
-  const finalAngle = Math.random() * 360;
-  const totalRotation = 360 * spins + finalAngle;
-  const duration = 4000;
-  const start = performance.now();
-
-  function animate(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    angle = totalRotation * easeOutCubic(progress);
-    drawWheel();
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((angle * Math.PI) / 180);
-    ctx.restore();
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      const index = Math.floor(((360 - (angle % 360)) / 360) * segments.length) % segments.length;
-      const reward = segments[index];
-      result.innerText = `🎉 Tu as gagné : ${reward}`;
-      saveSpin(walletAddress, reward); // firebase.js
-      isSpinning = false;
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-
-// === SPIN PAYANT ===
-async function payAndSpin() {
-  if (!walletAddress) {
-    alert("Connecte ton wallet d'abord !");
-    return;
-  }
-  const success = await payTon(walletAddress, 1); // depuis tonconnect.js
-  if (success) spinWheel();
-}
-
-// === BOUTONS ===
 spinBtn.addEventListener("click", () => {
-  if (!walletAddress) {
-    alert("Connecte ton wallet d'abord !");
-    return;
-  }
-  if (canSpinToday()) {
-    spinWheel();
-    markSpinToday();
-  } else {
-    alert("🕒 Tu as déjà utilisé ton spin gratuit aujourd’hui !");
-  }
+  const randomRotation = 360 * 5 + Math.floor(Math.random() * 360); // 5 tours + angle aléatoire
+  currentRotation += randomRotation;
+
+  wheelImg.style.transform = `rotate(${currentRotation}deg)`;
+
+  // Bonus : dire le résultat après le spin (exemple simple)
+  setTimeout(() => {
+    alert("🎁 Résultat : à personnaliser !");
+  }, 4000);
 });
-
-paySpinBtn.addEventListener("click", payAndSpin);
-
-// === ANIMATION ===
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-// === INIT ===
-drawWheel();
-document.getElementById("connectBtn").addEventListener("click", connectWallet);
-listenToLeaderboard((topPlayers) => {
-  const list = document.getElementById("leaderboardList");
-  list.innerHTML = "";
-  topPlayers.forEach((p, i) => {
-    const li = document.createElement("li");
-    li.innerText = `#${i + 1} ${p.wallet.slice(0, 6)}... : ${p.spins} spins`;
-    list.appendChild(li);
-  });
-});
-function canSpinToday() {
-  const last = localStorage.getItem("lastSpinDate");
-  const today = new Date().toISOString().split("T")[0];
-  return last !== today;
-}
-
-function markSpinToday() {
-  const today = new Date().toISOString().split("T")[0];
-  localStorage.setItem("lastSpinDate", today);
-}
-const address = await connectTonWallet();
-walletAddress = address;
-await checkWelcomeBonus(walletAddress);
-// Lors du chargement de la page
-const urlParams = new URLSearchParams(window.location.search);
-const refWallet = urlParams.get("ref");
-
-if (refWallet && walletAddress && refWallet !== walletAddress) {
-  addReferral(refWallet); // firebase.js
-}
-function getNextAirdropDate() {
-  const start = new Date("2025-01-01T00:00:00Z"); // date de départ
-  const now = new Date();
-  const months = 4;
-  let next = new Date(start);
-  while (next < now) {
-    next.setMonth(next.getMonth() + months);
-  }
-  return next;
-}
-
-function updateCountdown() {
-  const target = getNextAirdropDate();
-  const now = new Date();
-  const diff = target - now;
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
-  document.getElementById("airdropCountdown").innerText =
-    `🪂 Prochain airdrop dans : ${days}j ${hours}h ${minutes}min`;
-}
-
-setInterval(updateCountdown, 60000); // met à jour chaque minute
-updateCountdown();
-const ADMIN_WALLET = "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV"; // ton wallet
-
-
+// ——— Admin config
+const ADMIN_WALLET = "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV";
 
 function isAdmin(wallet) {
   return wallet === ADMIN_WALLET;
 }
-spinBtn.addEventListener("click", () => {
-  if (!walletAddress) {
-    alert("Connecte ton wallet d'abord !");
-    return;
+import { isAdmin } from "./wallet-admin.js";
+export async function payToSpin() {
+  const tx = {
+    validUntil: Math.floor(Date.now() / 1000) + 60,
+    messages: [
+      {
+        address: "UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV",
+        amount: "1000000000",
+        payload: ""
+      }
+    ]
+  };
+
+  try {
+    const result = await connector.sendTransaction(tx);
+    console.log("💸 1 TON reçu", result);
+    return true;
+  } catch (e) {
+    console.error("❌ Paiement échoué :", e);
+    return false;
   }
-
-  if (isAdmin(walletAddress)) {
-    spinWheel(); // admin peut tirer à volonté
-    return;
-  }
-
-  if (canSpinToday()) {
-    spinWheel();
-    markSpinToday();
-  } else {
-    alert("🕒 Tu as déjà utilisé ton spin gratuit aujourd’hui !");
-  }
-});
-listenToLeaderboard((players) => {
-  const list = document.getElementById("leaderboardList");
-  list.innerHTML = "";
-  players.forEach((p, i) => {
-    const li = document.createElement("li");
-    li.innerText = `#${i + 1} ${p.wallet.slice(0, 6)}... : ${p.spins} spins`;
-    list.appendChild(li);
-  });
-}, isAdmin(walletAddress));
-
-
+}
 import { payToSpin } from "./tonconnect.js";
+import { isAdmin } from "./wallet-admin.js";
+
+let walletAddress = null; // récupère-la après connexion TonConnect
 
 spinBtn.addEventListener("click", async () => {
   if (!walletAddress) {
-    alert("Connecte ton wallet d'abord !");
+    alert("🦊 Connecte d’abord ton wallet");
     return;
   }
 
   if (isAdmin(walletAddress)) {
-    spinWheel(); // 👑 Admin = spin illimité
+    // 👑 Spin gratuit et illimité pour toi
+    spinWheel();
     return;
   }
 
+  // Sinon, les autres : un spin gratuit par jour
   if (canSpinToday()) {
     spinWheel();
     markSpinToday();
   } else {
-    const confirmPay = confirm("Tu as déjà utilisé ton spin gratuit. Veux-tu payer 1 TON pour rejouer ?");
+    const confirmPay = confirm("Tu veux repayer 1 TON pour rejouer ?");
     if (confirmPay) {
       const paid = await payToSpin();
       if (paid) {
-        spinWheel(); // 🎡 Spin après paiement réussi
+        spinWheel();
       } else {
         alert("❌ Paiement échoué. Réessaie.");
       }
     }
   }
 });
+const walletDisplay = document.getElementById("walletDisplay");
+walletDisplay.innerText = isAdmin(walletAddress)
+  ? `${walletAddress} 👑 Admin`
+  : walletAddress;
 
-import { isAdmin } from "./wallet-admin.js";
-if (isAdmin(walletAddress)) {
-  UQCYDJ0nDSXZSIZj9kopm9pwm2Q3sFwtiSJu-EpNppSfWHeV
-const canvas = document.getElementById("wheelCanvas");
-const ctx = canvas.getContext("2d");
-const spinBtn = document.getElementById("spinBtn");
-
-const segments = ["1 TON", "0.5 TON", "💸 Perdu", "2 TON", "🎁 Bonus", "💀 Rien"];
-const colors = ["#FFD700", "#FF8C00", "#FF4444", "#00C851", "#33b5e5", "#888"];
-
-let angle = 0;
-let spinning = false;
-
-function drawWheel() {
-  const radius = canvas.width / 2;
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const arc = (2 * Math.PI) / segments.length;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  for (let i = 0; i < segments.length; i++) {
-    const start = angle + i * arc;
-    const end = start + arc;
-
-    ctx.beginPath();
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, radius, start, end);
-    ctx.fill();
-
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(start + arc / 2);
-    ctx.fillStyle = "#fff";
-    ctx.font = "16px sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(segments[i], radius - 10, 10);
-    ctx.restore();
-  }
-
-  // Flèche
-  ctx.beginPath();
-  ctx.moveTo(centerX - 10, 10);
-  ctx.lineTo(centerX + 10, 10);
-  ctx.lineTo(centerX, 40);
-  ctx.fillStyle = "#000";
-  ctx.fill();
-}
-
-function spinWheel() {
-  if (spinning) return;
-  spinning = true;
-
-  const spinAngle = Math.random() * 360 + 720; // 2 tours minimum
-  const duration = 3000;
-  const start = performance.now();
-
-  function animate(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    angle = (spinAngle * easeOut(progress)) * Math.PI / 180;
-    drawWheel();
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      spinning = false;
-      const selected = segments[Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * segments.length)];
-      alert("🎉 Résultat : " + selected);
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-
-function easeOut(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-drawWheel();
-spinBtn.addEventListener("click", spinWheel);
 
