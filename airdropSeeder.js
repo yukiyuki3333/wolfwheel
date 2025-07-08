@@ -41,3 +41,30 @@ seedAirdropDates();
   minPlayers: 100,
   minTON: 50
 }
+
+async function checkIfAirdropCanRun(airdrop) {
+  const now = new Date();
+  const airdropDate = new Date(airdrop.date);
+
+  if (airdrop.status !== "pending") return false;
+  if (now < airdropDate) return false;
+
+  const players = await getEligiblePlayers(); // ex: joueurs actifs
+  const tonPool = await getAvailableTON();    // ex: TON dispo
+
+  if (players.length >= airdrop.minPlayers && tonPool >= airdrop.minTON) {
+    return true; // ✅ On peut lancer l’airdrop
+  }
+
+  if (airdrop.flexible) {
+    // ⏳ Reporter l’airdrop de 1 mois
+    const newDate = new Date(airdropDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    await updateDoc(doc(db, "airdrops", airdrop.id), {
+      date: newDate.toISOString()
+    });
+    console.log("🔁 Airdrop reporté à :", newDate.toISOString());
+  }
+
+  return false;
+} 
