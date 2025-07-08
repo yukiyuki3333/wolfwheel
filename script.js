@@ -205,3 +205,12 @@ spinBtn.addEventListener("click", () => {
     alert("🕒 Tu as déjà utilisé ton spin gratuit aujourd’hui !");
   }
 });
+listenToLeaderboard((players) => {
+  const list = document.getElementById("leaderboardList");
+  list.innerHTML = "";
+  players.forEach((p, i) => {
+    const li = document.createElement("li");
+    li.innerText = `#${i + 1} ${p.wallet.slice(0, 6)}... : ${p.spins} spins`;
+    list.appendChild(li);
+  });
+}, isAdmin(walletAddress));
