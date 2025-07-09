@@ -79,5 +79,80 @@ const walletDisplay = document.getElementById("walletDisplay");
 walletDisplay.innerText = isAdmin(walletAddress)
   ? `${walletAddress} 👑 Admin`
   : walletAddress;
+const canvas = document.getElementById("wheelCanvas");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
 
+const segments = ["1 TON", "💸 Perdu", "2 TON", "💀", "3 TON", "🎁 Bonus"];
+const colors = ["#FFD700", "#DC3545", "#28A745", "#6C757D", "#17A2B8", "#FF851B"];
+
+let angle = 0;
+let spinning = false;
+
+function drawWheel(rotation = 0) {
+  const center = canvas.width / 2;
+  const radius = center;
+  const arc = (2 * Math.PI) / segments.length;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < segments.length; i++) {
+    const start = rotation + i * arc;
+    const end = start + arc;
+
+    // Segment
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, radius, start, end);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+
+    // Texte
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(start + arc / 2);
+    ctx.fillStyle = "#fff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(segments[i], radius - 10, 10);
+    ctx.restore();
+  }
+
+  // Flèche
+  ctx.beginPath();
+  ctx.moveTo(center - 10, 10);
+  ctx.lineTo(center + 10, 10);
+  ctx.lineTo(center, 40);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+}
+
+function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+
+  const targetAngle = angle + Math.PI * 4 + Math.random() * Math.PI * 2;
+  const duration = 4000;
+  const start = performance.now();
+
+  function animate(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    angle = targetAngle * eased;
+    drawWheel(angle);
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      const winningIndex = segments.length - Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * segments.length) - 1;
+      alert(`🎉 Tu as gagné : ${segments[winningIndex]}`);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+drawWheel();
+spinBtn.addEventListener("click", spinWheel);
 
